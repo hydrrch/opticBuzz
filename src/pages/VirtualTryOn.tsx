@@ -1,8 +1,10 @@
 import { motion } from 'motion/react';
 import { ArrowLeft, Camera, Share2, Download, RefreshCw } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { ARManager } from '../utils/arManager';
+import { useCartStore } from '../store/useCartStore';
+import { SAMPLE_PRODUCTS } from '../constants';
 
 export default function VirtualTryOn() {
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -10,6 +12,10 @@ export default function VirtualTryOn() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const arManagerRef = useRef<ARManager | null>(null);
+  
+  const [selectedFrame, setSelectedFrame] = useState(SAMPLE_PRODUCTS[0]);
+  const addItem = useCartStore(state => state.addItem);
+  const navigate = useNavigate();
 
   const startCamera = async () => {
     setIsLoading(true);
@@ -24,7 +30,7 @@ export default function VirtualTryOn() {
         // Initialize AR Manager
         arManagerRef.current = new ARManager(videoRef.current, canvasRef.current);
         // Default frame
-        arManagerRef.current.setFrame('https://i.ibb.co/L89YPhs/aviator-frame.png'); 
+        arManagerRef.current.setFrame(selectedFrame.images[0]); 
         
         await arManagerRef.current.start();
         setIsCameraActive(true);
@@ -45,17 +51,31 @@ export default function VirtualTryOn() {
     };
   }, []);
 
-  const selectFrame = (imgUrl: string) => {
+  const selectFrame = (frame: typeof SAMPLE_PRODUCTS[0]) => {
+    setSelectedFrame(frame);
     if (arManagerRef.current) {
-      arManagerRef.current.setFrame(imgUrl);
+      arManagerRef.current.setFrame(frame.images[0]);
     }
+  };
+
+  const handleAddToCart = () => {
+    addItem({
+      id: `${selectedFrame.id}-ar-try-on`,
+      name: selectedFrame.name,
+      brand: selectedFrame.brand,
+      price: selectedFrame.price,
+      image: selectedFrame.images[0],
+      quantity: 1,
+      variant: 'Virtual Try-On'
+    });
+    navigate('/cart');
   };
 
   return (
     <div className="min-h-screen bg-navy-900 text-white">
       {/* Header */}
-      <div className="p-6 flex justify-between items-center border-b border-white/10">
-        <Link to="/" className="flex items-center gap-2 text-gold-500 font-bold uppercase tracking-widest text-xs">
+      <div className="p-6 flex justify-between items-center border-b border-white/10 mt-16 lg:mt-0 lg:pt-32">
+        <Link to="/shop" className="flex items-center gap-2 text-gold-500 font-bold uppercase tracking-widest text-xs">
           <ArrowLeft size={16} /> Back to Shop
         </Link>
         <div className="text-center">
@@ -123,18 +143,13 @@ export default function VirtualTryOn() {
         {/* Sidebar Controls */}
         <div className="bg-navy-800 border-l border-white/5 flex flex-col h-full overflow-hidden">
           <div className="p-6 border-b border-white/5">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-gold-500 mb-4">Select Frame Style</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { name: 'Aviator', img: 'https://i.ibb.co/L89YPhs/aviator-frame.png' },
-                { name: 'Cat-Eye', img: 'https://i.ibb.co/qr0445y/cateye-frame.png' },
-                { name: 'Wayfarer', img: 'https://i.ibb.co/mb9X85z/wayfarer-frame.png' },
-                { name: 'Modern', img: 'https://i.ibb.co/0XzZ4yV/modern-frame.png' }
-              ].map((style) => (
+             <h3 className="text-xs font-bold uppercase tracking-widest text-gold-500 mb-4">Select Frame Style</h3>
+             <div className="grid grid-cols-2 gap-4 max-h-[200px] overflow-y-auto pr-2 scrollbar-hide">
+              {SAMPLE_PRODUCTS.map((style) => (
                  <button 
                   key={style.name} 
-                  onClick={() => selectFrame(style.img)}
-                  className="bg-white/5 border border-white/10 py-3 rounded-sm text-[10px] uppercase font-bold tracking-widest hover:border-gold-500 transition-all font-display"
+                  onClick={() => selectFrame(style)}
+                  className={`bg-white/5 border py-3 rounded-sm text-[8px] uppercase font-bold tracking-widest transition-all font-display ${selectedFrame.id === style.id ? 'border-gold-500 text-gold-500' : 'border-white/10 hover:border-white/30 text-white'}`}
                  >
                    {style.name}
                  </button>
@@ -147,19 +162,22 @@ export default function VirtualTryOn() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-pearl/40 mb-4">Currently Trying</p>
               <div className="bg-white/5 p-4 rounded-sm border border-white/10 flex gap-4">
                 <div className="w-16 h-16 bg-navy-900 flex items-center justify-center rounded overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" />
+                  <img src={selectedFrame.images[0]} className="w-full h-full object-cover p-2" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold uppercase">Aviator Gold</h4>
-                  <p className="text-xs text-gold-400 font-bold mt-1">Rs. 18,500</p>
-                  <Link to="/shop" className="text-[10px] uppercase text-pearl/40 underline mt-2 inline-block">Product Details</Link>
+                  <h4 className="text-[10px] font-bold uppercase">{selectedFrame.name}</h4>
+                  <p className="text-xs text-gold-400 font-bold mt-1">Rs. {selectedFrame.price.toLocaleString()}</p>
+                  <Link to={`/product/${selectedFrame.id}`} className="text-[10px] uppercase text-pearl/40 underline mt-2 inline-block">Product Details</Link>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="p-6 bg-navy-900">
-             <button className="w-full bg-gold-500 text-navy-900 py-4 text-xs font-bold uppercase tracking-[.2em] shadow-xl hover:bg-white transition-all">
+          <div className="p-6 bg-navy-900 border-t border-white/5">
+             <button 
+                onClick={handleAddToCart}
+                className="w-full bg-gold-500 text-navy-900 py-4 text-xs font-bold uppercase tracking-[.2em] shadow-xl hover:bg-white transition-all"
+             >
                Add to Cart
              </button>
           </div>

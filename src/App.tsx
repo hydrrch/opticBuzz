@@ -14,6 +14,11 @@ import Checkout from './pages/Checkout';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import PrescriptionUpload from './pages/PrescriptionUpload';
+import TrackOrder from './pages/TrackOrder';
+import FindStore from './pages/FindStore';
+import FAQ from './pages/FAQ';
+import Shipping from './pages/Shipping';
+import Contact from './pages/Contact';
 
 export default function App() {
   return (
@@ -29,6 +34,12 @@ export default function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/upload-prescription" element={<PrescriptionUpload />} />
           <Route path="/try-on" element={<VirtualTryOn />} />
+          <Route path="/track-order" element={<TrackOrder />} />
+          <Route path="/find-store" element={<FindStore />} />
+          <Route path="/stores" element={<FindStore />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/shipping" element={<Shipping />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </Layout>
     </Router>

@@ -18,12 +18,12 @@ export default function ProductDetails() {
     addItem({
       id: `${product.id}-${selectedColor}`,
       name: product.name,
+      brand: product.brand,
       price: product.price,
       image: product.images[0],
       quantity: quantity,
-      variant: selectedColor,
-      productId: product.id
-    } as any);
+      variant: selectedColor
+    });
   };
 
   return (
