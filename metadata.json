@@ -1,0 +1,12 @@
+{
+  "name": "Opti Buzz",
+  "description": "Premium eyewear eCommerce platform for Pakistan featuring AR Virtual Try-On and Prescription management.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "eCommerce",
+    "AR/VR",
+    "User Accounts"
+  ]
+}

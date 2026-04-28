@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Public and private user information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["customer", "admin"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "fullName", "email"]
+    },
+    "Product": {
+      "title": "Eyewear Product",
+      "description": "Details about glasses, lenses, and accessories",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "brand": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string" },
+        "stock": { "type": "number" },
+        "images": { "type": "array" },
+        "description": { "type": "string" },
+        "rating": { "type": "number" }
+      }
+    },
+    "Prescription": {
+      "title": "Vision Prescription",
+      "description": "Medical prescription data for lenses",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "rightEye": { "type": "object" },
+        "leftEye": { "type": "object" },
+        "pd": { "type": "number" },
+        "verified": { "type": "boolean" },
+        "fileUrl": { "type": "string" }
+      }
+    },
+    "Order": {
+      "title": "Customer Order",
+      "description": "Details of a purchase transaction",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "items": { "type": "array" },
+        "status": { "type": "string" },
+        "total": { "type": "number" },
+        "shippingAddress": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Publicly readable product catalog"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles managed by owners"
+    },
+    "/prescriptions/{prescriptionId}": {
+      "schema": "Prescription",
+      "description": "Prescription data only seen by owner and admins"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Orders readable by owner and admins"
+    }
+  }
+}
